@@ -1,20 +1,22 @@
-package ru.practicum.shareit.user;
+package ru.practicum.shareit.user.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.*;
+import ru.practicum.shareit.Create;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 
-/**
- * TODO Sprint add-controllers.
- */
-@Data
+
+@Getter
+@Setter
+@NoArgsConstructor
 @AllArgsConstructor
-public class User {
+@ToString
+public class UserDto {
     Long id;
     @NotBlank
     @Email(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,6}$", message = "Ошибка при создании пользователя: Email пользователя не соответствует нужному формату")
     String email;
+    @NotBlank
     String name;
 }
