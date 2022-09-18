@@ -1,4 +1,4 @@
-package ru.practicum.shareit.item;
+package ru.practicum.shareit.item.dto;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +8,7 @@ import ru.practicum.shareit.Create;
 import ru.practicum.shareit.Update;
 import ru.practicum.shareit.exception.EntityNotFoundException;
 import ru.practicum.shareit.exception.FailureException;
+import ru.practicum.shareit.item.ItemService;
 import ru.practicum.shareit.item.dto.ItemDto;
 
 import java.util.List;
@@ -24,21 +25,21 @@ public class ItemController {
     ItemService itemService;
 
     @PostMapping
-    ItemDto createItem(@RequestHeader("X-Sharer-User-Id") long userId, @Validated({Create.class}) @RequestBody ItemDto itemDto) throws EntityNotFoundException {
+    ItemDto create(@RequestHeader("X-Sharer-User-Id") long userId, @Validated({Create.class}) @RequestBody ItemDto itemDto) throws EntityNotFoundException {
         log.info("Создаём новый Item...");
-        return itemService.createItem(itemDto, userId);
+        return itemService.create(itemDto, userId);
     }
 
     @PatchMapping("/{itemId}")
-    ItemDto updateItem(@RequestHeader("X-Sharer-User-Id") long userId, @PathVariable Long itemId, @Validated({Update.class}) @RequestBody ItemDto itemDto) throws EntityNotFoundException, FailureException {
+    ItemDto update(@RequestHeader("X-Sharer-User-Id") long userId, @PathVariable Long itemId, @Validated({Update.class}) @RequestBody ItemDto itemDto) throws EntityNotFoundException, FailureException {
         log.info("Обновляем Item...");
-        return itemService.updateItem(itemDto, userId, itemId);
+        return itemService.update(itemDto, userId, itemId);
     }
 
     @GetMapping("/{itemId}")
-    ItemDto getItem(@PathVariable long itemId) {
+    ItemDto get(@PathVariable long itemId) {
         log.info("Выводим Item...");
-        return itemService.getItemById(itemId);
+        return itemService.get(itemId);
     }
 
     @GetMapping

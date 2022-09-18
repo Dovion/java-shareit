@@ -7,7 +7,7 @@ import ru.practicum.shareit.exception.EntityNotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.request.ItemRequest;
-import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.UserRepository;
 
 import java.util.ArrayList;
@@ -21,25 +21,25 @@ public class ItemService {
     @Autowired
     UserRepository userRepository;
 
-    public ItemDto createItem(ItemDto itemDto, long userId) throws EntityNotFoundException {
-        User owner = userRepository.findById(userId);
+    public ItemDto create(ItemDto itemDto, long userId) throws EntityNotFoundException {
+        User owner = userRepository.get(userId);
         if (owner == null) {
             throw new EntityNotFoundException("Ошибка при создании Item`a: передан неверный id владельца");
         }
         itemDto.setOwner(owner);
         Item item = ItemMapper.toItem(itemDto);
-        itemRepository.save(item);
-        var resultDto = ItemMapper.toItemDto(itemRepository.getItemById(item.getId()));
+        itemRepository.create(item);
+        var resultDto = ItemMapper.toItemDto(itemRepository.get(item.getId()));
         log.info("Item успешно добавлен");
         return resultDto;
     }
 
-    public ItemDto updateItem(ItemDto itemDto, long userId, long itemId) throws EntityNotFoundException {
-        Item item = itemRepository.getItemById(itemId);
+    public ItemDto update(ItemDto itemDto, long userId, long itemId) throws EntityNotFoundException {
+        Item item = itemRepository.get(itemId);
         if (item == null) {
             throw new EntityNotFoundException("Ошибка при обновлении Item`a: передан неверный id");
         }
-        if (userRepository.findById(userId) == null || !item.getOwner().getId().equals(userId)) {
+        if (userRepository.get(userId) == null || !item.getOwner().getId().equals(userId)) {
             throw new EntityNotFoundException("Ошибка при обновлении Item`a: попытка обновления чужого предмета");
         }
         if (itemDto.getName() != null) {
@@ -60,9 +60,9 @@ public class ItemService {
     }
 
 
-    public ItemDto getItemById(long id) {
+    public ItemDto get(long id) {
         log.info("Вывод Item`a произошёл успешно");
-        return ItemMapper.toItemDto(itemRepository.getItemById(id));
+        return ItemMapper.toItemDto(itemRepository.get(id));
     }
 
     public List<ItemDto> getAllUserItems(long id) {

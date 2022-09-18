@@ -19,7 +19,7 @@ public class ItemRepository {
     Map<Long, Item> items = new HashMap<>();
     private static Long id = Long.valueOf(0);
 
-    public Item save(Item item) {
+    public Item create(Item item) {
         item.setId(++id);
         items.put(id, item);
         return items.get(item.getId());
@@ -30,7 +30,7 @@ public class ItemRepository {
         return items.get(item.getId());
     }
 
-    public Item getItemById(long id) {
+    public Item get(long id) {
         return items.get(id);
     }
 

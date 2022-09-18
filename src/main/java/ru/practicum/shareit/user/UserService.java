@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.EntityNotFoundException;
 import ru.practicum.shareit.exception.FailureException;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.model.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +34,7 @@ public class UserService {
     }
 
     public UserDto update(Long id, UserDto userDto) throws EntityNotFoundException, FailureException {
-        User user = userRepository.findById(id);
+        User user = userRepository.get(id);
         if (user == null) {
             throw new EntityNotFoundException("Ошибка при обновлении пользователя: передан неверный id");
         }
@@ -63,7 +64,7 @@ public class UserService {
     }
 
     public UserDto get(Long id) {
-        User user = userRepository.findById(id);
+        User user = userRepository.get(id);
         var resultDto = UserMapper.toUserDto(user);
         log.info("Пользователь успешно выведен");
         return resultDto;

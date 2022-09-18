@@ -1,10 +1,11 @@
-package ru.practicum.shareit.user;
+package ru.practicum.shareit.user.dto;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.exception.EntityNotFoundException;
 import ru.practicum.shareit.exception.FailureException;
+import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.user.dto.UserDto;
 
 import javax.validation.Valid;
@@ -40,7 +41,7 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    public UserDto getUser(@PathVariable Long userId) {
+    public UserDto get(@PathVariable Long userId) {
         log.info("Выводим пользователя...");
         return userService.get(userId);
     }
