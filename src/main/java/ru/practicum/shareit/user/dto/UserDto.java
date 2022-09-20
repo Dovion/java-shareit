@@ -12,10 +12,10 @@ import javax.validation.constraints.NotBlank;
 @AllArgsConstructor
 @ToString
 public class UserDto {
-    Long id;
+    private Long id;
     @NotBlank
     @Email(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,6}$", message = "Ошибка при создании пользователя: Email пользователя не соответствует нужному формату")
-    String email;
+    private String email;
     @NotBlank
-    String name;
+    private String name;
 }

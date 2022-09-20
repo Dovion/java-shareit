@@ -1,10 +1,13 @@
-package ru.practicum.shareit.user;
+package ru.practicum.shareit.user.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.EntityNotFoundException;
 import ru.practicum.shareit.exception.FailureException;
+import ru.practicum.shareit.user.UserMapper;
+import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 
@@ -13,10 +16,11 @@ import java.util.List;
 
 @Slf4j
 @Service
-public class UserService {
+@RequiredArgsConstructor
+public class UserServiceImpl {
 
     @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     public UserDto create(UserDto userDto) throws FailureException {
         var allUsers = userRepository.getAllUsers();

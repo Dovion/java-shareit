@@ -1,6 +1,8 @@
 package ru.practicum.shareit.item;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
@@ -14,8 +16,11 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Repository
+@RequiredArgsConstructor
 public class ItemRepository {
 
+    @Autowired
+    private final ItemMapper itemMapper;
     Map<Long, Item> items = new HashMap<>();
     private static Long id = Long.valueOf(0);
 
@@ -39,7 +44,7 @@ public class ItemRepository {
         List<Item> itemList = new ArrayList<>(items.values());
         for (var item : itemList) {
             if (item.getOwner().getId() == id) {
-                resultList.add(ItemMapper.toItemDto(item));
+                resultList.add(itemMapper.toItemDto(item));
             }
         }
         return resultList;

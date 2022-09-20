@@ -2,15 +2,10 @@ package ru.practicum.shareit.item.dto;
 
 import lombok.*;
 import ru.practicum.shareit.Create;
-import ru.practicum.shareit.request.ItemRequest;
-import ru.practicum.shareit.user.model.User;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-/**
- * TODO Sprint add-controllers.
- */
 @Getter
 @Setter
 @NoArgsConstructor
@@ -25,6 +20,6 @@ public class ItemDto {
     private String description;
     @NotNull(groups = {Create.class})
     private Boolean available;
-    User owner;
-    ItemRequest itemRequest;
+    private Long userId;
+    private Long itemRequestId;
 }
