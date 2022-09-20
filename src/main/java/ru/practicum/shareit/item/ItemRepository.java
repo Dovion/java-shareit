@@ -22,7 +22,7 @@ public class ItemRepository {
     @Autowired
     private final ItemMapper itemMapper;
     Map<Long, Item> items = new HashMap<>();
-    private static Long id = Long.valueOf(0);
+    private Long id = Long.valueOf(0);
 
     public Item create(Item item) {
         item.setId(++id);
