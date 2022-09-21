@@ -24,8 +24,7 @@ public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     @Autowired
     private final UserRepository userRepository;
-    @Autowired
-    private final ItemMapper itemMapper;
+
 
     public ItemDto create(ItemDto itemDto, long userId) throws EntityNotFoundException {
         User owner = userRepository.get(userId);
@@ -33,9 +32,9 @@ public class ItemServiceImpl implements ItemService {
             throw new EntityNotFoundException("Ошибка при создании Item`a: передан неверный id владельца");
         }
         itemDto.setUserId(userId);
-        Item item = itemMapper.toItem(itemDto);
+        Item item = ItemMapper.toItem(itemDto, userRepository.get(userId));
         itemRepository.create(item);
-        var resultDto = itemMapper.toItemDto(itemRepository.get(item.getId()));
+        var resultDto = ItemMapper.toItemDto(itemRepository.get(item.getId()));
         log.info("Item успешно добавлен");
         return resultDto;
     }
@@ -62,13 +61,13 @@ public class ItemServiceImpl implements ItemService {
         }
         itemRepository.update(item);
         log.info("Item успешно обновлён");
-        return itemMapper.toItemDto(item);
+        return ItemMapper.toItemDto(item);
     }
 
 
     public ItemDto get(long id) {
         log.info("Вывод Item`a произошёл успешно");
-        return itemMapper.toItemDto(itemRepository.get(id));
+        return ItemMapper.toItemDto(itemRepository.get(id));
     }
 
     public List<ItemDto> getAllUserItems(long id) {
@@ -80,7 +79,7 @@ public class ItemServiceImpl implements ItemService {
         var list = itemRepository.getItemByText(text);
         List<ItemDto> resultList = new ArrayList<>();
         for (var item : list) {
-            resultList.add(itemMapper.toItemDto(item));
+            resultList.add(ItemMapper.toItemDto(item));
         }
         log.info("Вывод Item`a по текстовому поиску произошёл успешно");
         return resultList;
