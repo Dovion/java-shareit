@@ -2,87 +2,58 @@ package ru.practicum.shareit.user.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.EntityNotFoundException;
-import ru.practicum.shareit.exception.FailureException;
 import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class UserServiceImpl {
+public class UserServiceImpl implements UserService {
 
-    @Autowired
     private final UserRepository userRepository;
 
-    public UserDto create(UserDto userDto) throws FailureException {
-        var allUsers = userRepository.getAllUsers();
-        if (!allUsers.isEmpty()) {
-            for (var user1 : allUsers) {
-                if (user1.getEmail().equals(userDto.getEmail())) {
-                    throw new FailureException("Ошибка при создании пользователя: данный email уже используется");
-                }
-            }
-        }
-        User user = userRepository.create(UserMapper.toUser(userDto));
-        var resultDto = UserMapper.toUserDto(user);
-        log.info("Пользователь успешно добавлен");
-        return resultDto;
+    @Override
+    public UserDto create(UserDto userDto) {
+        User user = userRepository.save(UserMapper.toUser(userDto));
+        return UserMapper.toUserDto(user);
     }
 
-    public UserDto update(Long id, UserDto userDto) throws EntityNotFoundException, FailureException {
-        User user = userRepository.get(id);
-        if (user == null) {
-            throw new EntityNotFoundException("Ошибка при обновлении пользователя: передан неверный id");
-        }
-        var allUsers = userRepository.getAllUsers();
-        if (!allUsers.isEmpty()) {
-            for (var user1 : allUsers) {
-                if (user1.getEmail().equals(userDto.getEmail())) {
-                    throw new FailureException("Ошибка при обновлении пользователя: данный email уже используется");
-                }
-            }
+    @Override
+    public UserDto update(Long userId, UserDto userDto) throws EntityNotFoundException {
+        User user = userRepository.findById(userId).orElseThrow(() ->
+                new EntityNotFoundException("Ошибка при обновлении пользователя: передан неверный Id пользователя"));
+        if (userDto.getName() != null) {
+            user.setName(userDto.getName());
         }
         if (userDto.getEmail() != null) {
             user.setEmail(userDto.getEmail());
         }
-        if (userDto.getName() != null) {
-            user.setName(userDto.getName());
-        }
-        userRepository.update(user);
-        var resultDto = UserMapper.toUserDto(user);
-        log.info("Пользователь успешно обновлён");
-        return resultDto;
+        userRepository.save(user);
+        return UserMapper.toUserDto(user);
     }
 
-    public void delete(Long id) {
-        userRepository.delete(id);
-        log.info("Пользователь успешно удалён");
+    @Override
+    public List<UserDto> getAll() {
+        return userRepository.findAll().stream().map(UserMapper::toUserDto).collect(Collectors.toList());
     }
 
-    public UserDto get(Long id) {
-        User user = userRepository.get(id);
-        var resultDto = UserMapper.toUserDto(user);
-        log.info("Пользователь успешно выведен");
-        return resultDto;
+    @Override
+    public void delete(Long userId) throws EntityNotFoundException {
+        getUser(userId);
+        userRepository.deleteById(userId);
     }
 
-    public List<UserDto> getAllUsers() {
-        var usersList = userRepository.getAllUsers();
-        List<UserDto> usersDtoList = new ArrayList<>();
-        for (var user : usersList) {
-            usersDtoList.add(UserMapper.toUserDto(user));
-        }
-        log.info("Список пользователей успешно выведен");
-        return usersDtoList;
+    @Override
+    public UserDto getUser(Long userId) throws EntityNotFoundException {
+        User user = userRepository.findById(userId).orElseThrow(() ->
+                new EntityNotFoundException("Ошибка при получении пользователя: передан неверный Id пользователя"));
+        return UserMapper.toUserDto(user);
     }
-
-
 }

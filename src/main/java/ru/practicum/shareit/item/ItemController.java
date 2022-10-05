@@ -2,54 +2,62 @@ package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.Create;
-import ru.practicum.shareit.Update;
 import ru.practicum.shareit.exception.EntityNotFoundException;
-import ru.practicum.shareit.exception.FailureException;
+import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.service.ItemServiceImpl;
+import ru.practicum.shareit.item.dto.ItemInfoDto;
+import ru.practicum.shareit.item.service.ItemService;
+import ru.practicum.shareit.review.ReviewDto;
 
+import javax.validation.Valid;
 import java.util.List;
 
-@Slf4j
 @RestController
+@Slf4j
 @RequestMapping("/items")
 @RequiredArgsConstructor
 public class ItemController {
 
-    @Autowired
-    private final ItemServiceImpl itemServiceImpl;
+    private final ItemService itemService;
 
     @PostMapping
-    ItemDto create(@RequestHeader("X-Sharer-User-Id") long userId, @Validated({Create.class}) @RequestBody ItemDto itemDto) throws EntityNotFoundException {
-        log.info("Создаём новый Item...");
-        return itemServiceImpl.create(itemDto, userId);
+    public ItemDto create(@RequestHeader("X-Sharer-User-Id") long userId, @Valid @RequestBody ItemDto itemDto) throws EntityNotFoundException {
+        log.info("Создаём новую вещь...");
+        return itemService.create(userId, itemDto);
     }
 
-    @PatchMapping("/{itemId}")
-    ItemDto update(@RequestHeader("X-Sharer-User-Id") long userId, @PathVariable Long itemId, @Validated({Update.class}) @RequestBody ItemDto itemDto) throws EntityNotFoundException, FailureException {
-        log.info("Обновляем Item...");
-        return itemServiceImpl.update(itemDto, userId, itemId);
+    @PatchMapping("/{id}")
+    public ItemDto update(@RequestHeader("X-Sharer-User-Id") long userId, @PathVariable long id,
+                          @RequestBody ItemDto itemDto) throws EntityNotFoundException {
+        log.info("Обновляем вещь...");
+        return itemService.update(userId, id, itemDto);
     }
 
     @GetMapping("/{itemId}")
-    ItemDto get(@PathVariable long itemId) {
-        log.info("Выводим Item...");
-        return itemServiceImpl.get(itemId);
+    public ItemInfoDto getItem(@PathVariable long itemId, @RequestHeader("X-Sharer-User-Id") long userId) throws EntityNotFoundException {
+        log.info("Выводим вещь...");
+        return itemService.getItem(itemId, userId);
     }
 
     @GetMapping
-    List<ItemDto> getAllUserItems(@RequestHeader("X-Sharer-User-Id") long userId) {
-        log.info("Выводим список Item`ов...");
-        return itemServiceImpl.getAllUserItems(userId);
+    public List<ItemInfoDto> getAllItemsByUser(@RequestHeader("X-Sharer-User-Id") long userId) {
+        log.info("Выводим вещи пользователя...");
+        return itemService.getAllItemsByUser(userId);
     }
 
     @GetMapping("/search")
-    List<ItemDto> getItemByText(@RequestParam(required = false) String text) {
-        log.info("Выводим Item по текстовому поиску...");
-        return itemServiceImpl.getItemByText(text);
+    public List<ItemDto> findByText(@RequestParam String text) {
+        log.info("Вывод вещи по текстовому запросу...");
+        return itemService.findByText(text);
+    }
+
+
+    @PostMapping("/{itemId}/comment")
+    public ReviewDto creteReview(@RequestHeader("X-Sharer-User-Id") long userId,
+                                   @Valid @RequestBody ReviewDto commentDto,
+                                   @PathVariable long itemId) throws ValidationException, EntityNotFoundException {
+        log.info("Создаём отзыв...");
+        return itemService.createReview(userId, itemId, commentDto);
     }
 }

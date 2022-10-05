@@ -1,51 +1,56 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.BookingMapper;
+import ru.practicum.shareit.booking.BookingRepository;
+import ru.practicum.shareit.booking.model.BookingStatus;
+import ru.practicum.shareit.booking.dto.BookingDtoId;
 import ru.practicum.shareit.exception.EntityNotFoundException;
+import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemInfoDto;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.request.ItemRequest;
+import ru.practicum.shareit.review.ReviewDto;
+import ru.practicum.shareit.review.ReviewMapper;
+import ru.practicum.shareit.review.ReviewRepository;
+import ru.practicum.shareit.review.model.Review;
 import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.model.User;
 
-import java.util.ArrayList;
+import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
-    @Autowired
     private final ItemRepository itemRepository;
-    @Autowired
     private final UserRepository userRepository;
+    private final ReviewRepository reviewRepository;
+    private final BookingRepository bookingRepository;
 
-
-    public ItemDto create(ItemDto itemDto, long userId) throws EntityNotFoundException {
-        User owner = userRepository.get(userId);
-        if (owner == null) {
-            throw new EntityNotFoundException("Ошибка при создании Item`a: передан неверный id владельца");
-        }
-        itemDto.setUserId(userId);
-        Item item = ItemMapper.toItem(itemDto, userRepository.get(userId));
-        itemRepository.create(item);
-        var resultDto = ItemMapper.toItemDto(itemRepository.get(item.getId()));
-        log.info("Item успешно добавлен");
-        return resultDto;
+    @Override
+    public ItemDto create(Long userId, ItemDto itemDto) throws EntityNotFoundException {
+        Item item = ItemMapper.toItem(itemDto);
+        User user = userRepository.findById(userId).orElseThrow(() ->
+                new EntityNotFoundException("Ошибка при создании вещи: передан неверный Id пользователя"));
+        item.setOwner(user);
+        itemRepository.save(item);
+        return ItemMapper.toItemDto(item);
     }
 
-    public ItemDto update(ItemDto itemDto, long userId, long itemId) throws EntityNotFoundException {
-        Item item = itemRepository.get(itemId);
-        if (item == null) {
-            throw new EntityNotFoundException("Ошибка при обновлении Item`a: передан неверный id");
-        }
-        if (userRepository.get(userId) == null || !item.getOwner().getId().equals(userId)) {
-            throw new EntityNotFoundException("Ошибка при обновлении Item`a: попытка обновления чужого предмета");
+    @Override
+    public ItemDto update(Long userId, Long itemId, ItemDto itemDto) throws EntityNotFoundException {
+        Item item = itemRepository.findById(itemId).orElseThrow(() ->
+                new EntityNotFoundException("Ошибка при обновлении вещи: передан неверный Id пользователя"));
+        if (userRepository.findById(userId).isEmpty() || !item.getOwner().getId().equals(userId)) {
+            throw new EntityNotFoundException("Ошибка при обновлении вещи: поступил запрос на обновление чужой вещи");
         }
         if (itemDto.getName() != null) {
             item.setName(itemDto.getName());
@@ -56,33 +61,91 @@ public class ItemServiceImpl implements ItemService {
         if (itemDto.getAvailable() != null) {
             item.setAvailable(itemDto.getAvailable());
         }
-        if (itemDto.getItemRequestId() != null) {
-            item.setRequest(new ItemRequest());
-        }
-        itemRepository.update(item);
-        log.info("Item успешно обновлён");
+        itemRepository.save(item);
         return ItemMapper.toItemDto(item);
     }
 
+    @Override
+    public ItemInfoDto getItem(Long itemId, Long userId) throws EntityNotFoundException {
+        Item item = itemRepository.findById(itemId).orElseThrow(() ->
+                new EntityNotFoundException("Ошибка при получении вещи: передан неверный Id пользователя"));
+        ItemInfoDto itemDtoBooking = ItemMapper.toItemDtoWithBooking(item);
 
-    public ItemDto get(long id) {
-        log.info("Вывод Item`a произошёл успешно");
-        return ItemMapper.toItemDto(itemRepository.get(id));
-    }
-
-    public List<ItemDto> getAllUserItems(long id) {
-        log.info("Вывод списка Item`ов произошёл успешно");
-        return itemRepository.getAllUserItems(id);
-    }
-
-    public List<ItemDto> getItemByText(String text) {
-        var list = itemRepository.getItemByText(text);
-        List<ItemDto> resultList = new ArrayList<>();
-        for (var item : list) {
-            resultList.add(ItemMapper.toItemDto(item));
+        if (item.getOwner().getId().equals(userId)) {
+            createItemDtoWithBooking(itemDtoBooking);
         }
-        log.info("Вывод Item`a по текстовому поиску произошёл успешно");
-        return resultList;
+        List<Review> reviews = reviewRepository.findAllByItemId(itemId);
+        if (!reviews.isEmpty()) {
+            itemDtoBooking.setComments(reviews
+                    .stream().map(ReviewMapper::toReviewDto)
+                    .collect(Collectors.toList())
+            );
+        }
+        return itemDtoBooking;
     }
 
+    @Override
+    public List<ItemInfoDto> getAllItemsByUser(Long userId) {
+        List<ItemInfoDto> userItemList = itemRepository.findAll().stream()
+                .filter(item -> item.getOwner().getId().equals(userId))
+                .map(ItemMapper::toItemDtoWithBooking)
+                .collect(Collectors.toList());
+        for (ItemInfoDto itemDtoBooking : userItemList) {
+            createItemDtoWithBooking(itemDtoBooking);
+            List<Review> reviews = reviewRepository.findAllByItemId(itemDtoBooking.getId());
+            if (!reviews.isEmpty()) {
+                itemDtoBooking.setComments(reviews
+                        .stream().map(ReviewMapper::toReviewDto)
+                        .collect(Collectors.toList()));
+            }
+        }
+        userItemList.sort(Comparator.comparing(ItemInfoDto::getId));
+        return userItemList;
+    }
+
+    @Override
+    public List<ItemDto> findByText(String text) {
+        if (!text.isBlank()) {
+            return itemRepository.findByText(text)
+                    .stream()
+                    .filter(Item::getAvailable)
+                    .map(ItemMapper::toItemDto)
+                    .collect(Collectors.toList());
+        }
+        return Collections.emptyList();
+    }
+
+    private void createItemDtoWithBooking(ItemInfoDto itemDtoBooking) {
+        List<Booking> lastBookings = bookingRepository
+                .findBookingsByItemIdAndEndIsBeforeOrderByEndDesc(itemDtoBooking.getId(),
+                        LocalDateTime.now());
+        if (!lastBookings.isEmpty()) {
+            BookingDtoId lastBooking = BookingMapper.toBookingDtoId(lastBookings.get(0));
+            itemDtoBooking.setLastBooking(lastBooking);
+        }
+        List<Booking> nextBookings = bookingRepository
+                .findBookingsByItemIdAndStartIsAfterOrderByStartDesc(itemDtoBooking.getId(),
+                        LocalDateTime.now());
+        if (!nextBookings.isEmpty()) {
+            BookingDtoId nextBooking = BookingMapper.toBookingDtoId(nextBookings.get(0));
+            itemDtoBooking.setNextBooking(nextBooking);
+        }
+    }
+
+    @Override
+    public ReviewDto createReview(Long userId, Long itemId, ReviewDto reviewDto) throws EntityNotFoundException, ValidationException {
+        Item item = itemRepository.findById(itemId).orElseThrow(() ->
+                new EntityNotFoundException("Ошибка при создании отзыва: неверный Id вещи"));
+        User user = userRepository.findById(userId).orElseThrow(() ->
+                new EntityNotFoundException("Ошибка при создании отзыва: неверный Id пользователя"));
+        bookingRepository.searchBookingByBookerIdAndItemIdAndEndIsBefore(userId, itemId, LocalDateTime.now())
+                .stream()
+                .filter(booking -> booking.getStatus().equals(BookingStatus.APPROVED)).findAny()
+                .orElseThrow(() -> new ValidationException("Ошибка при создании отзыва: передан запрос на создание отзыва при отсуствии бронирования вещи"));
+        Review review = ReviewMapper.toReview(reviewDto);
+        review.setItem(item);
+        review.setAuthor(user);
+        reviewRepository.save(review);
+        return ReviewMapper.toReviewDto(review);
+    }
 }

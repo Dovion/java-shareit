@@ -1,22 +1,18 @@
 package ru.practicum.shareit.user.service;
 
 import ru.practicum.shareit.exception.EntityNotFoundException;
-import ru.practicum.shareit.exception.FailureException;
 import ru.practicum.shareit.user.dto.UserDto;
 
 import java.util.List;
 
 public interface UserService {
+    UserDto create(UserDto userDto);
 
-    public UserDto create(UserDto userDto) throws FailureException;
+    UserDto update(Long userId, UserDto userDto) throws EntityNotFoundException;
 
-    public UserDto update(Long id, UserDto userDto) throws EntityNotFoundException, FailureException;
+    List<UserDto> getAll();
 
-    public void delete(Long id);
+    void delete(Long userId) throws EntityNotFoundException;
 
-    public UserDto get(Long id);
-
-    public List<UserDto> getAllUsers();
-
-
+    UserDto getUser(Long userId) throws EntityNotFoundException;
 }
