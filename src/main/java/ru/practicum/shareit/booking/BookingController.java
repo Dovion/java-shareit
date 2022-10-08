@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingDtoShort;
+import ru.practicum.shareit.booking.model.BookingState;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.exception.EntityNotFoundException;
@@ -35,25 +36,17 @@ public class BookingController {
 
     @GetMapping
     public List<BookingDto> getAll(@RequestHeader("X-Sharer-User-Id") long userId,
-                                   @RequestParam(defaultValue = "ALL") String state) throws ValidationException, EntityNotFoundException {
+                                   @RequestParam(defaultValue = "ALL") String state) throws Throwable {
         log.info("Выводим все бронирования...");
-        try {
-            BookingStatus status = BookingStatus.valueOf(state);
-        } catch (IllegalArgumentException e) {
-            throw new ValidationException("Ошибка при выводен всех бронирований: передан неверный статус");
-        }
+        BookingState.from(state).orElseThrow(() -> new ValidationException("Ошибка при выводе всех бронирований: передан неверный статус"));
         return bookingService.getAll(userId, state);
     }
 
     @GetMapping("/owner")
     public List<BookingDto> getAllBookingByOwner(@RequestHeader("X-Sharer-User-Id") long userId,
-                                                 @RequestParam(defaultValue = "ALL") String state) throws ValidationException, EntityNotFoundException {
+                                                 @RequestParam(defaultValue = "ALL") String state) throws Throwable {
         log.info("Выводим все бронирования пользователя...");
-        try {
-            BookingStatus status = BookingStatus.valueOf(state);
-        } catch (IllegalArgumentException e) {
-            throw new ValidationException("Ошибка при выводен всех бронирований пользователя: передан неверный статус");
-        }
+        BookingState.from(state).orElseThrow(() -> new ValidationException("Ошибка при выводе всех бронирований пользователя: передан неверный статус"));
         return bookingService.getAllBookingByOwner(userId, state);
     }
 

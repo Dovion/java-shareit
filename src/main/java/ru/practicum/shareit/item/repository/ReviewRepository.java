@@ -1,8 +1,8 @@
-package ru.practicum.shareit.review;
+package ru.practicum.shareit.item.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import ru.practicum.shareit.review.model.Review;
+import ru.practicum.shareit.item.model.Review;
 
 import java.util.List;
 

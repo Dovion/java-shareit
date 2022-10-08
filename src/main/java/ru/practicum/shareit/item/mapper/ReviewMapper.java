@@ -1,7 +1,8 @@
-package ru.practicum.shareit.review;
+package ru.practicum.shareit.item.mapper;
 
 import org.springframework.stereotype.Component;
-import ru.practicum.shareit.review.model.Review;
+import ru.practicum.shareit.item.dto.ReviewDto;
+import ru.practicum.shareit.item.model.Review;
 
 import java.time.LocalDateTime;
 

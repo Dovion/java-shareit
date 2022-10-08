@@ -8,7 +8,7 @@ import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemInfoDto;
 import ru.practicum.shareit.item.service.ItemService;
-import ru.practicum.shareit.review.ReviewDto;
+import ru.practicum.shareit.item.dto.ReviewDto;
 
 import javax.validation.Valid;
 import java.util.List;
