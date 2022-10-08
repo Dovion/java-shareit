@@ -12,12 +12,12 @@ public enum BookingState {
     WAITING,
     REJECTED;
 
-    public static Optional from(String stringState) throws ValidationException {
+    public static Optional from(String state) throws ValidationException {
         Optional value = null;
         try {
-            value = Optional.of(BookingState.valueOf(stringState));
+            value = Optional.of(BookingState.valueOf(state));
         } catch (IllegalArgumentException e) {
-            throw new ValidationException("Unknown state: " + stringState);
+            throw new ValidationException("Unknown state: " + state);
         }
         return value;
     }
