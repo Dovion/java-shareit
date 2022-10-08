@@ -15,8 +15,8 @@ public enum BookingState {
     public static Optional from(String stringState) throws ValidationException {
         Optional value = null;
         try {
-             value = Optional.of(BookingState.valueOf(stringState));
-        } catch (IllegalArgumentException e){
+            value = Optional.of(BookingState.valueOf(stringState));
+        } catch (IllegalArgumentException e) {
             throw new ValidationException("Unknown state: " + stringState);
         }
         return value;
