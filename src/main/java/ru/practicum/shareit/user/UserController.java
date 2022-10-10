@@ -2,52 +2,48 @@ package ru.practicum.shareit.user;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.exception.EntityNotFoundException;
-import ru.practicum.shareit.exception.FailureException;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.service.UserServiceImpl;
+import ru.practicum.shareit.user.service.UserService;
 
 import javax.validation.Valid;
 import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping(path = "/users")
 @RequiredArgsConstructor
+@RequestMapping("/users")
 public class UserController {
-
-    @Autowired
-    private final UserServiceImpl userServiceImpl;
+    private final UserService userService;
 
     @PostMapping
-    public UserDto create(@Valid @RequestBody UserDto userDto) throws FailureException {
-        log.info("Создаем пользователя...");
-        return userServiceImpl.create(userDto);
+    public UserDto create(@Valid @RequestBody UserDto userDto) {
+        log.info("Создаём пользователя...");
+        return userService.create(userDto);
     }
 
     @PatchMapping("/{userId}")
-    public UserDto update(@PathVariable Long userId, @RequestBody UserDto userDto) throws EntityNotFoundException, FailureException {
+    public UserDto update(@PathVariable Long userId, @RequestBody UserDto userDto) throws EntityNotFoundException {
         log.info("Обновляем пользователя...");
-        return userServiceImpl.update(userId, userDto);
+        return userService.update(userId, userDto);
     }
 
     @DeleteMapping("/{userId}")
-    public void delete(@PathVariable Long userId) {
+    public void delete(@PathVariable Long userId) throws EntityNotFoundException {
         log.info("Удаляем пользователя...");
-        userServiceImpl.delete(userId);
+        userService.delete(userId);
     }
 
     @GetMapping("/{userId}")
-    public UserDto get(@PathVariable Long userId) {
+    public UserDto getUser(@PathVariable Long userId) throws EntityNotFoundException {
         log.info("Выводим пользователя...");
-        return userServiceImpl.get(userId);
+        return userService.getUser(userId);
     }
 
     @GetMapping
     public List<UserDto> getAll() {
-        log.info("Выводим список всех пользователей...");
-        return userServiceImpl.getAllUsers();
+        log.info("Выводим всех пользователей...");
+        return userService.getAll();
     }
 }
