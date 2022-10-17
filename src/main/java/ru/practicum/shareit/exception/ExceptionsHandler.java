@@ -16,12 +16,6 @@ public class ExceptionsHandler {
         return ex.getMessage();
     }
 
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    @ExceptionHandler(value = {FailureException.class})
-    public String failureHandler(Exception ex) {
-        return ex.getMessage();
-    }
-
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(value = {ValidationException.class})
     public static ResponseEntity<Map<String, String>> validationHandler(Exception ex) {

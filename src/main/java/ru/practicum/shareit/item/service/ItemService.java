@@ -15,9 +15,9 @@ public interface ItemService {
 
     ItemInfoDto getItem(Long itemId, Long userId) throws EntityNotFoundException;
 
-    List<ItemInfoDto> getAllItemsByUser(Long userId);
+    List<ItemInfoDto> getAllItemsByUser(Long userId, Integer from, Integer size);
 
-    List<ItemDto> findByText(String text);
+    List<ItemDto> findByText(String text, Integer from, Integer size);
 
     ReviewDto createReview(Long userId, Long itemId, ReviewDto reviewDto) throws EntityNotFoundException, ValidationException;
 }

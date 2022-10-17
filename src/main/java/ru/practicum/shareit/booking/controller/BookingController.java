@@ -1,4 +1,4 @@
-package ru.practicum.shareit.booking;
+package ru.practicum.shareit.booking.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,8 +21,7 @@ public class BookingController {
     private final BookingService bookingService;
 
     @PostMapping
-    public BookingDto create(@Valid @RequestBody BookingDtoShort bookingDtoShort,
-                             @RequestHeader("X-Sharer-User-Id") long userId) throws ValidationException, EntityNotFoundException {
+    public BookingDto create(@Valid @RequestBody BookingDtoShort bookingDtoShort, @RequestHeader("X-Sharer-User-Id") long userId) throws ValidationException, EntityNotFoundException {
         log.info("Создаём новое бронирование...");
         return bookingService.create(bookingDtoShort, userId);
     }
@@ -34,24 +33,27 @@ public class BookingController {
     }
 
     @GetMapping
-    public List<BookingDto> getAll(@RequestHeader("X-Sharer-User-Id") long userId,
-                                   @RequestParam(defaultValue = "ALL") String state) throws Throwable {
+    public List<BookingDto> getAll(@RequestHeader("X-Sharer-User-Id") long userId, @RequestParam(defaultValue = "ALL") String state, @RequestParam(defaultValue = "0") int from, @RequestParam(defaultValue = "20") int size) throws Throwable {
         log.info("Выводим все бронирования...");
+        if (from < 0) {
+            throw new ValidationException("Ошибка при выводе всех бронирований: передан отрицательный индекс");
+        }
         BookingState.from(state).orElseThrow(() -> new ValidationException("Ошибка при выводе всех бронирований: передан неверный статус"));
-        return bookingService.getAll(userId, state);
+        return bookingService.getAll(userId, state, from, size);
     }
 
     @GetMapping("/owner")
-    public List<BookingDto> getAllBookingByOwner(@RequestHeader("X-Sharer-User-Id") long userId,
-                                                 @RequestParam(defaultValue = "ALL") String state) throws Throwable {
+    public List<BookingDto> getAllBookingByOwner(@RequestHeader("X-Sharer-User-Id") long userId, @RequestParam(defaultValue = "ALL") String state, @RequestParam(defaultValue = "0") int from, @RequestParam(defaultValue = "20") int size) throws Throwable {
         log.info("Выводим все бронирования пользователя...");
+        if (from < 0) {
+            throw new ValidationException("Ошибка при выводе всех бронирований: передан отрицательный индекс");
+        }
         BookingState.from(state).orElseThrow(() -> new ValidationException("Ошибка при выводе всех бронирований пользователя: передан неверный статус"));
-        return bookingService.getAllBookingByOwner(userId, state);
+        return bookingService.getAllBookingByOwner(userId, state, from, size);
     }
 
     @PatchMapping("/{bookingId}")
-    public BookingDto approve(@RequestHeader("X-Sharer-User-Id") long userId,
-                              @PathVariable long bookingId, @RequestParam Boolean approved) throws ValidationException, EntityNotFoundException {
+    public BookingDto approve(@RequestHeader("X-Sharer-User-Id") long userId, @PathVariable long bookingId, @RequestParam Boolean approved) throws ValidationException, EntityNotFoundException {
         log.info("Подтверждаем бронирование...");
         return bookingService.approve(userId, bookingId, approved);
     }
