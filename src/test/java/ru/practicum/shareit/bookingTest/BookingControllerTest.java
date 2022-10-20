@@ -10,6 +10,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
@@ -42,6 +44,7 @@ import static ru.practicum.shareit.booking.model.BookingStatus.WAITING;
 @ExtendWith(MockitoExtension.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @MockitoSettings(strictness = Strictness.LENIENT)
+////@JsonTest
 public class BookingControllerTest {
     @Mock
     private BookingService bookingService;
@@ -50,6 +53,8 @@ public class BookingControllerTest {
     private Booking booking;
     private MockMvc mockMvc;
     private final ObjectMapper mapper = new ObjectMapper();
+    @Autowired
+    private JacksonTester<BookingDto> json;
 
     @BeforeEach
     void beforeEach() {
@@ -284,5 +289,6 @@ public class BookingControllerTest {
                         " \"booker\": {\"id\": 2,\"name\": \"testBooker\",\"email\": \"testBooker@test.ru\"}}"));
         verify(bookingService, times(1)).approve(itemUserId, bookingId, true);
     }
+
 
 }

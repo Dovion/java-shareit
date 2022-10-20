@@ -5,9 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.exception.EntityNotFoundException;
-import ru.practicum.shareit.request.service.ItemRequestService;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestDtoWithItemList;
+import ru.practicum.shareit.request.service.ItemRequestService;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
@@ -23,7 +23,8 @@ public class ItemRequestController {
     private final ItemRequestService itemRequestService;
 
     @PostMapping
-    public ItemRequestDto create(@RequestHeader("X-Sharer-User-Id") Long userId, @Valid @RequestBody ItemRequestDto itemRequestDto) throws EntityNotFoundException {
+    public ItemRequestDto create(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                 @Valid @RequestBody ItemRequestDto itemRequestDto) throws EntityNotFoundException {
         log.info("Создаём запрос...");
         return itemRequestService.create(itemRequestDto, userId);
     }
@@ -35,13 +36,16 @@ public class ItemRequestController {
     }
 
     @GetMapping("/all")
-    public List<ItemRequestDtoWithItemList> getAllWithPageable(@RequestHeader("X-Sharer-User-Id") Long userId, @RequestParam(defaultValue = "0") @Min(0) Integer from, @RequestParam(defaultValue = "20") @Positive Integer size) throws EntityNotFoundException {
+    public List<ItemRequestDtoWithItemList> getAllWithPageable(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                                               @RequestParam(defaultValue = "0") @Min(0) Integer from,
+                                                               @RequestParam(defaultValue = "20") @Positive Integer size) throws EntityNotFoundException {
         log.info("Выводим все запрос с пагинацией...");
         return itemRequestService.getAllWithPageable(userId, from, size);
     }
 
     @GetMapping("/{requestId}")
-    public ItemRequestDtoWithItemList getItemRequest(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable Long requestId) throws EntityNotFoundException {
+    public ItemRequestDtoWithItemList getItemRequest(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                                     @PathVariable Long requestId) throws EntityNotFoundException {
         log.info("Выводим запрос...");
         return itemRequestService.getItemRequest(userId, requestId);
     }

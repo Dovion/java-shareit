@@ -11,10 +11,13 @@ import java.util.List;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
 
-    @Query("SELECT b " + "FROM Booking b LEFT JOIN User AS us ON b.booker.id = us.id " + "WHERE us.id = ?1 " + "AND ?2 BETWEEN b.start AND b.end " + "ORDER BY b.start DESC")
+    @Query("SELECT b " + "FROM Booking b LEFT JOIN User AS us ON b.booker.id = us.id " +
+            "WHERE us.id = ?1 " + "AND ?2 BETWEEN b.start AND b.end " + "ORDER BY b.start DESC")
     List<Booking> searchCurrentBookingsByBookerId(long userId, LocalDateTime time, Pageable pageable);
 
-    @Query("SELECT b " + "FROM Booking b LEFT JOIN Item AS i ON b.item.id = i.id " + "LEFT JOIN User AS us ON i.owner.id = us.id " + "WHERE us.id = ?1 " + "AND ?2 BETWEEN b.start AND b.end " + "ORDER BY b.start DESC")
+    @Query("SELECT b " + "FROM Booking b LEFT JOIN Item AS i ON b.item.id = i.id " +
+            "LEFT JOIN User AS us ON i.owner.id = us.id " + "WHERE us.id = ?1 " +
+            "AND ?2 BETWEEN b.start AND b.end " + "ORDER BY b.start DESC")
     List<Booking> searchCurrentBookingsByItemOwnerId(long userId, LocalDateTime time, Pageable pageable);
 
     List<Booking> searchByBookerIdOrderByStartDesc(long userId, Pageable pageable);

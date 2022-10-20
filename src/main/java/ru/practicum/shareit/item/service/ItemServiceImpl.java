@@ -4,11 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.booking.mapper.BookingMapper;
-import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.booking.dto.BookingDtoId;
+import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
+import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exception.EntityNotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -21,8 +21,8 @@ import ru.practicum.shareit.item.model.Review;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.item.repository.ReviewRepository;
 import ru.practicum.shareit.request.repository.ItemRequestRepository;
-import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -131,7 +131,9 @@ public class ItemServiceImpl implements ItemService {
     public ReviewDto createReview(Long userId, Long itemId, ReviewDto reviewDto) throws EntityNotFoundException, ValidationException {
         Item item = itemRepository.findById(itemId).orElseThrow(() -> new EntityNotFoundException("Ошибка при создании отзыва: неверный Id вещи"));
         User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("Ошибка при создании отзыва: неверный Id пользователя"));
-        bookingRepository.searchBookingByBookerIdAndItemIdAndEndIsBeforeAndStatus(userId, itemId, LocalDateTime.now(), BookingStatus.APPROVED).stream().filter(booking -> booking.getStatus().equals(BookingStatus.APPROVED)).findAny().orElseThrow(() -> new ValidationException("Ошибка при создании отзыва: передан запрос на создание отзыва при отсуствии бронирования вещи"));
+        bookingRepository.searchBookingByBookerIdAndItemIdAndEndIsBeforeAndStatus(userId, itemId, LocalDateTime.now(),
+                        BookingStatus.APPROVED).stream().filter(booking -> booking.getStatus().equals(BookingStatus.APPROVED)).
+                findAny().orElseThrow(() -> new ValidationException("Ошибка при создании отзыва: передан запрос на создание отзыва при отсуствии бронирования вещи"));
         Review review = ReviewMapper.toReview(reviewDto);
         review.setItem(item);
         review.setAuthor(user);

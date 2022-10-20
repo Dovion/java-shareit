@@ -11,8 +11,8 @@ import ru.practicum.shareit.request.dto.ItemRequestDtoWithItemList;
 import ru.practicum.shareit.request.mapper.ItemRequestMapper;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.repository.ItemRequestRepository;
-import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -49,7 +49,8 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     public List<ItemRequestDtoWithItemList> getAllWithPageable(Long userId, Integer from, Integer size) throws EntityNotFoundException {
         Pageable pageable = PageRequest.of(from / size, size, Sort.by("created"));
         userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("Ошибка при получении запроса с пагинацией: передан неверный id пользователя"));
-        return itemRequestRepository.findAll(pageable).stream().filter(itemRequest -> !itemRequest.getRequester().getId().equals(userId)).map(itemRequestMapper::toItemRequestDtoWithItems).collect(Collectors.toList());
+        return itemRequestRepository.findAll(pageable).stream()
+                .filter(itemRequest -> !itemRequest.getRequester().getId().equals(userId)).map(itemRequestMapper::toItemRequestDtoWithItems).collect(Collectors.toList());
     }
 }
 

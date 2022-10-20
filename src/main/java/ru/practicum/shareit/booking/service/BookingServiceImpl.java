@@ -76,10 +76,10 @@ public class BookingServiceImpl implements BookingService {
                 return bookingRepository.searchBookingsByBookerIdAndEndIsAfterOrderByEndDesc(userId, LocalDateTime.now(), pageable).stream()
                         .map(BookingMapper::toBookingDto).collect(Collectors.toList());
             case WAITING:
-                return bookingRepository.searchBookingsByBookerIdAndStatus(userId, BookingStatus.WAITING, pageable).stream()/////
+                return bookingRepository.searchBookingsByBookerIdAndStatus(userId, BookingStatus.WAITING, pageable).stream()
                         .map(BookingMapper::toBookingDto).collect(Collectors.toList());
             case REJECTED:
-                return bookingRepository.searchBookingsByBookerIdAndStatus(userId, BookingStatus.REJECTED, pageable).stream()////
+                return bookingRepository.searchBookingsByBookerIdAndStatus(userId, BookingStatus.REJECTED, pageable).stream()
                         .map(BookingMapper::toBookingDto).collect(Collectors.toList());
             default:
                 throw new ValidationException("Unknown state: " + state);

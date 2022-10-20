@@ -10,10 +10,17 @@ import java.time.LocalDateTime;
 public class ReviewMapper {
 
     public static Review toReview(ReviewDto reviewDto) {
-        return new Review(reviewDto.getId(), reviewDto.getText(), null, null, LocalDateTime.now());
+        return new Review(reviewDto.getId(),
+                reviewDto.getText(),
+                null,
+                null,
+                LocalDateTime.now());
     }
 
     public static ReviewDto toReviewDto(Review review) {
-        return new ReviewDto(review.getId(), review.getText(), review.getAuthor().getName(), review.getCreated());
+        return new ReviewDto(review.getId(),
+                review.getText(),
+                review.getAuthor().getName(),
+                review.getCreated());
     }
 }
