@@ -132,8 +132,8 @@ public class ItemServiceImpl implements ItemService {
         Item item = itemRepository.findById(itemId).orElseThrow(() -> new EntityNotFoundException("Ошибка при создании отзыва: неверный Id вещи"));
         User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("Ошибка при создании отзыва: неверный Id пользователя"));
         bookingRepository.searchBookingByBookerIdAndItemIdAndEndIsBeforeAndStatus(userId, itemId, LocalDateTime.now(),
-                        BookingStatus.APPROVED).stream().filter(booking -> booking.getStatus().equals(BookingStatus.APPROVED)).
-                findAny().orElseThrow(() -> new ValidationException("Ошибка при создании отзыва: передан запрос на создание отзыва при отсуствии бронирования вещи"));
+                        BookingStatus.APPROVED).stream().filter(booking -> booking.getStatus().equals(BookingStatus.APPROVED))
+                        .findAny().orElseThrow(() -> new ValidationException("Ошибка при создании отзыва: передан запрос на создание отзыва при отсуствии бронирования вещи"));
         Review review = ReviewMapper.toReview(reviewDto);
         review.setItem(item);
         review.setAuthor(user);
