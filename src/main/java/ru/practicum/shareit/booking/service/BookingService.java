@@ -12,11 +12,11 @@ public interface BookingService {
 
     BookingDto getBooking(long bookingId, long userId) throws EntityNotFoundException;
 
-    List<BookingDto> getAll(long userId, String state) throws EntityNotFoundException, ValidationException;
+    List<BookingDto> getAll(long userId, String state, int from, int size) throws EntityNotFoundException, ValidationException;
 
     BookingDto approve(long userId, long bookingId, Boolean approved) throws EntityNotFoundException, ValidationException;
 
-    List<BookingDto> getAllBookingByOwner(long userId, String state) throws EntityNotFoundException, ValidationException;
+    List<BookingDto> getAllBookingByOwner(long userId, String state, int from, int size) throws EntityNotFoundException, ValidationException;
 
 
 }

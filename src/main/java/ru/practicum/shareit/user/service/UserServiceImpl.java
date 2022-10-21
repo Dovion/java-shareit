@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.EntityNotFoundException;
-import ru.practicum.shareit.user.UserMapper;
-import ru.practicum.shareit.user.UserRepository;
+import ru.practicum.shareit.user.mapper.UserMapper;
+import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 

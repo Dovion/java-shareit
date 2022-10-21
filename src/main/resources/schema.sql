@@ -1,6 +1,7 @@
 DROP TABLE IF EXISTS bookings;
 DROP TABLE IF EXISTS reviews;
 DROP TABLE IF EXISTS items;
+DROP TABLE IF EXISTS requests;
 DROP TABLE IF EXISTS users;
 CREATE TABLE IF NOT EXISTS users
 (
@@ -8,6 +9,17 @@ CREATE TABLE IF NOT EXISTS users
     user_name VARCHAR(255)                        NOT NULL,
     email     VARCHAR(255)                        NOT NULL,
     CONSTRAINT unique_email UNIQUE (email)
+);
+
+
+CREATE TABLE IF NOT EXISTS requests
+(
+    request_id   BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    description  VARCHAR(255) NOT NULL,
+    requester_id BIGINT REFERENCES requests (request_id),
+    created      timestamp WITHOUT TIME ZONE,
+    CONSTRAINT fk_request_to_users FOREIGN KEY (requester_id)
+        REFERENCES users (user_id)
 );
 
 CREATE TABLE IF NOT EXISTS items
