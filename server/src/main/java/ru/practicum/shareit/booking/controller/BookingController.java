@@ -37,11 +37,6 @@ public class BookingController {
                                    @RequestParam(defaultValue = "ALL") String state,
                                    @RequestParam(defaultValue = "0") int from,
                                    @RequestParam(defaultValue = "20") int size) throws Throwable {
-//        log.info("Выводим все бронирования...");
-//        if (from < 0) {
-//            throw new ValidationException("Ошибка при выводе всех бронирований: передан отрицательный индекс");
-//        }
-//        BookingState.from(state).orElseThrow(() -> new ValidationException("Ошибка при выводе всех бронирований: передан неверный статус"));
         return bookingService.getAll(userId, state, from, size);
     }
 
@@ -51,10 +46,6 @@ public class BookingController {
                                                  @RequestParam(defaultValue = "0") int from,
                                                  @RequestParam(defaultValue = "20") int size) throws ValidationException, EntityNotFoundException {
         log.info("Выводим все бронирования пользователя...");
-//        if (from < 0) {
-//            throw new ValidationException("Ошибка при выводе всех бронирований: передан отрицательный индекс");
-//        }
-//        BookingState.from(state).orElseThrow(() -> new ValidationException("Ошибка при выводе всех бронирований пользователя: передан неверный статус"));
         return bookingService.getAllBookingByOwner(userId, state, from, size);
     }
 
